@@ -10,21 +10,22 @@ import notasRouter from "./modules/notas/notas.router.js";
 
 const app = express();
 
-// Configurações básicas
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
 
-// Swagger (documentação)
+// 🔹 caminho relativo correto para o swagger.yaml
 const swaggerDocument = YAML.load("./swagger.yaml");
+
+// 🔹 rota da documentação
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Rotas principais
+// 🔹 suas rotas principais
 app.use("/api/empresas", empresasRouter);
 app.use("/api/produtos", produtosRouter);
 app.use("/api/notas", notasRouter);
 
-// Rota padrão
+// 🔹 rota base
 app.get("/", (_, res) => res.send("✅ API FiscalManager Total online!"));
 
 export default app;
