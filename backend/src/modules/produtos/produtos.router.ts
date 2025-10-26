@@ -4,46 +4,46 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 const router = Router();
 
-// ✅ Listar todos os produtos
+// Listar produtos
 router.get("/", async (_req, res) => {
   const produtos = await prisma.produto.findMany();
   res.json(produtos);
 });
 
-// ✅ Criar novo produto
+// Criar produto
 router.post("/", async (req, res) => {
   const { nome, preco, empresaId } = req.body;
-  if (!nome || !preco)
+  if (!nome || preco === undefined)
     return res.status(400).json({ error: "Nome e preço são obrigatórios." });
 
   const produto = await prisma.produto.create({
-    data: { nome, preco: Number(preco), empresaId },
+    data: { nome, preco: parseFloat(preco), empresaId },
   });
   res.status(201).json(produto);
 });
 
-// ✅ Buscar produto por ID
+// Buscar produto
 router.get("/:id", async (req, res) => {
   const produto = await prisma.produto.findUnique({
-    where: { id: Number(req.params.id) },
+    where: { id: req.params.id },
   });
   if (!produto) return res.status(404).json({ error: "Produto não encontrado." });
   res.json(produto);
 });
 
-// ✅ Atualizar produto
+// Atualizar produto
 router.put("/:id", async (req, res) => {
   const { nome, preco } = req.body;
   const produto = await prisma.produto.update({
-    where: { id: Number(req.params.id) },
-    data: { nome, preco: Number(preco) },
+    where: { id: req.params.id },
+    data: { nome, preco: parseFloat(preco) },
   });
   res.json(produto);
 });
 
-// ✅ Deletar produto
+// Deletar produto
 router.delete("/:id", async (req, res) => {
-  await prisma.produto.delete({ where: { id: Number(req.params.id) } });
+  await prisma.produto.delete({ where: { id: req.params.id } });
   res.json({ message: "Produto deletado com sucesso." });
 });
 
