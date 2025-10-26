@@ -8,53 +8,48 @@ datasource db {
 }
 
 model Usuario {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  senhaHash String
-  role      String   @default("admin")
-  criadoEm  DateTime @default(now())
+  id         String   @id @default(cuid())
+  email      String   @unique
+  senhaHash  String
+  role       String   @default("admin")
+  criadoEm   DateTime @default(now())
 }
 
 model Empresa {
-  id        String        @id @default(cuid())
+  id        String    @id @default(cuid())
   nome      String
-  cnpj      String        @unique
-  criadoEm  DateTime      @default(now())
+  cnpj      String    @unique
+  endereco  String?
   produtos  Produto[]
-  notas     NotaFiscal[]  // <- ADICIONADO
+  notas     NotaFiscal[]
+  criadoEm  DateTime  @default(now())
 }
 
 model Produto {
-  id        String    @id @default(cuid())
-  empresaId String
-  nome      String
-  ncm       String
-  cfop      String?
-  criadoEm  DateTime  @default(now())
-  empresa   Empresa   @relation(fields: [empresaId], references: [id])
-  itensNF   ItemNF[]  // <- ADICIONADO
+  id         String    @id @default(cuid())
+  nome       String
+  preco      Float
+  empresaId  String
+  empresa    Empresa   @relation(fields: [empresaId], references: [id])
+  itens      ItemNF[]
+  criadoEm   DateTime  @default(now())
 }
 
 model NotaFiscal {
-  id        String     @id @default(cuid())
-  empresaId String
-  chave     String     @unique
-  xmlRaw    String
-  criadoEm  DateTime   @default(now())
-  empresa   Empresa    @relation(fields: [empresaId], references: [id])
-  itens     ItemNF[]
+  id         String    @id @default(cuid())
+  numero     String
+  total      Float
+  empresaId  String
+  empresa    Empresa   @relation(fields: [empresaId], references: [id])
+  itens      ItemNF[]
+  criadoEm   DateTime  @default(now())
 }
 
 model ItemNF {
-  id         String     @id @default(cuid())
+  id         String      @id @default(cuid())
   notaId     String
   produtoId  String?
-  descricao  String?
-  ncm        String
-  cfop       String?
-  quantidade Decimal     @default(1.0)
-  valorUnit  Decimal     @default(0.0)
-  valorTotal Decimal     @default(0.0)
+  quantidade Int
   nfe        NotaFiscal  @relation(fields: [notaId], references: [id])
   produto    Produto?    @relation(fields: [produtoId], references: [id])
 }
