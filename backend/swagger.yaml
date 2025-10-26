@@ -2,18 +2,195 @@ openapi: 3.0.0
 info:
   title: FiscalManager Total API
   version: 1.0.0
-  description: API de gestão fiscal, empresas, produtos e notas fiscais.
+  description: >
+    API completa de gestão fiscal — com controle de empresas, produtos e notas fiscais.
+    Desenvolvida para o sistema **FiscalManager Total**, com autenticação JWT e integração com o Prisma ORM.
 servers:
   - url: https://fiscalmanager-backend.onrender.com
+    description: Servidor principal de produção
+
+tags:
+  - name: Autenticação
+    description: Login e geração de token JWT
+  - name: Empresas
+    description: Cadastro e listagem de empresas
+  - name: Produtos
+    description: Cadastro e controle de produtos
+  - name: Notas Fiscais
+    description: Emissão e consulta de notas fiscais
+
 paths:
-  /api/empresas:
-    get:
-      summary: Lista todas as empresas
+  /api/auth/login:
+    post:
+      tags: [Autenticação]
+      summary: Faz login e gera token JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, senha]
+              properties:
+                email:
+                  type: string
+                  example: admin@fiscalmanager.com
+                senha:
+                  type: string
+                  example: "123456"
       responses:
         "200":
-          description: Lista retornada com sucesso
+          description: Login realizado com sucesso
+          content:
+            application/json:
+              example:
+                token: "eyJhbGciOiJIUzI1NiIsInR5..."
+                user:
+                  id: 1
+                  email: admin@fiscalmanager.com
+                  role: admin
+        "401":
+          description: Credenciais inválidas
+
+  /api/empresas:
+    get:
+      tags: [Empresas]
+      summary: Lista todas as empresas cadastradas
+      responses:
+        "200":
+          description: Lista de empresas
+          content:
+            application/json:
+              example:
+                - id: 1
+                  nome: ACME LTDA
+                  cnpj: "12345678000190"
+                  endereco: Rua das Flores, 100
+                - id: 2
+                  nome: Beta Corp
+                  cnpj: "98765432000155"
+                  endereco: Av. Central, 450
     post:
+      tags: [Empresas]
       summary: Cria uma nova empresa
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nome, cnpj, endereco]
+              properties:
+                nome:
+                  type: string
+                cnpj:
+                  type: string
+                endereco:
+                  type: string
+              example:
+                nome: Nova Empresa SA
+                cnpj: "11222333000100"
+                endereco: Rua Alfa, 321
       responses:
         "201":
-          description: Empresa criada
+          description: Empresa criada com sucesso
+
+  /api/produtos:
+    get:
+      tags: [Produtos]
+      summary: Lista todos os produtos
+      responses:
+        "200":
+          description: Lista de produtos
+          content:
+            application/json:
+              example:
+                - id: 1
+                  descricao: Teclado Mecânico
+                  preco: 320.5
+                  ncm: "84716053"
+                  empresaId: 1
+                - id: 2
+                  descricao: Monitor 24"
+                  preco: 899.9
+                  ncm: "85285200"
+                  empresaId: 1
+    post:
+      tags: [Produtos]
+      summary: Cadastra um novo produto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [descricao, preco, ncm, empresaId]
+              properties:
+                descricao:
+                  type: string
+                preco:
+                  type: number
+                ncm:
+                  type: string
+                empresaId:
+                  type: integer
+              example:
+                descricao: Impressora térmica
+                preco: 399.99
+                ncm: "84433211"
+                empresaId: 1
+      responses:
+        "201":
+          description: Produto cadastrado com sucesso
+
+  /api/notas:
+    get:
+      tags: [Notas Fiscais]
+      summary: Lista todas as notas fiscais
+      responses:
+        "200":
+          description: Notas fiscais cadastradas
+          content:
+            application/json:
+              example:
+                - id: 1
+                  numero: 1001
+                  empresaId: 1
+                  total: 1580.0
+                  dataEmissao: "2025-10-26"
+    post:
+      tags: [Notas Fiscais]
+      summary: Cria uma nova nota fiscal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [empresaId, produtos]
+              properties:
+                empresaId:
+                  type: integer
+                produtos:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      produtoId:
+                        type: integer
+                      quantidade:
+                        type: number
+                      precoUnitario:
+                        type: number
+              example:
+                empresaId: 1
+                produtos:
+                  - produtoId: 1
+                    quantidade: 2
+                    precoUnitario: 320.5
+                  - produtoId: 2
+                    quantidade: 1
+                    precoUnitario: 899.9
+      responses:
+        "201":
+          description: Nota fiscal criada com sucesso
