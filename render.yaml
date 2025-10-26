@@ -6,7 +6,8 @@ services:
     region: oregon
     rootDir: backend
     buildCommand: |
-      npm ci
+     buildCommand: |
+      npm install
       npm run build
       npx prisma generate
       # opcional: aplicar schema na primeira vez (se preferir, faça manualmente no dashboard)
