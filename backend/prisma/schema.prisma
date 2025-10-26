@@ -16,30 +16,32 @@ model Usuario {
 }
 
 model Empresa {
-  id        String   @id @default(cuid())
+  id        String        @id @default(cuid())
   nome      String
-  cnpj      String   @unique
-  criadoEm  DateTime @default(now())
+  cnpj      String        @unique
+  criadoEm  DateTime      @default(now())
   produtos  Produto[]
+  notas     NotaFiscal[]  // <- ADICIONADO
 }
 
 model Produto {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   empresaId String
   nome      String
   ncm       String
   cfop      String?
-  criadoEm  DateTime @default(now())
-  empresa   Empresa  @relation(fields: [empresaId], references: [id])
+  criadoEm  DateTime  @default(now())
+  empresa   Empresa   @relation(fields: [empresaId], references: [id])
+  itensNF   ItemNF[]  // <- ADICIONADO
 }
 
 model NotaFiscal {
-  id        String   @id @default(cuid())
+  id        String     @id @default(cuid())
   empresaId String
-  chave     String   @unique
+  chave     String     @unique
   xmlRaw    String
-  criadoEm  DateTime @default(now())
-  empresa   Empresa  @relation(fields: [empresaId], references: [id])
+  criadoEm  DateTime   @default(now())
+  empresa   Empresa    @relation(fields: [empresaId], references: [id])
   itens     ItemNF[]
 }
 
