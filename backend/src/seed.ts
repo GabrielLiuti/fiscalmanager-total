@@ -1,20 +1,41 @@
 import { PrismaClient } from '@prisma/client';
-import argon2 from 'argon2';
 const prisma = new PrismaClient();
 
 async function main() {
-  const senhaHash = await argon2.hash('123456');
-  await prisma.usuario.upsert({
-    where: { email: 'admin@demo.com' },
-    update: {},
-    create: { email: 'admin@demo.com', senhaHash, role: 'admin' }
-  });
+  console.log('🌱 Iniciando seed de dados...');
+
   const empresa = await prisma.empresa.create({
-    data: { nome: 'Demo Indústria SP', cnpj: '00.000.000/0001-00' }
+    data: {
+      nome: 'Empresa Exemplo LTDA',
+      cnpj: '12345678000100',
+      endereco: 'Rua Principal, 1000'
+    }
   });
-  await prisma.produto.create({
-    data: { empresaId: empresa.id, nome: 'Cabo de Rede Cat6', ncm: '8544.42.00', cfop: '5102' }
+
+  const produto1 = await prisma.produto.create({
+    data: { nome: 'Produto A', preco: 10.5, empresaId: empresa.id }
   });
-  console.log('Seed concluído');
+
+  const produto2 = await prisma.produto.create({
+    data: { nome: 'Produto B', preco: 20.0, empresaId: empresa.id }
+  });
+
+  await prisma.notaFiscal.create({
+    data: {
+      numero: '0001',
+      empresaId: empresa.id,
+      itens: {
+        create: [
+          { produtoId: produto1.id, quantidade: 2, valor: 21.0 },
+          { produtoId: produto2.id, quantidade: 1, valor: 20.0 }
+        ]
+      }
+    }
+  });
+
+  console.log('✅ Seed concluído com sucesso!');
 }
-main().catch((e) => (console.error(e), process.exit(1))).finally(async () => prisma.$disconnect());
+
+main()
+  .catch(e => console.error(e))
+  .finally(async () => await prisma.$disconnect());
