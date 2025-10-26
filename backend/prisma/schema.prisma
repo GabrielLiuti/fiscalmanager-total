@@ -1,5 +1,11 @@
-generator client { provider = "prisma-client-js" }
-datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
 model Usuario {
   id        String   @id @default(cuid())
@@ -8,6 +14,7 @@ model Usuario {
   role      String   @default("admin")
   criadoEm  DateTime @default(now())
 }
+
 model Empresa {
   id        String   @id @default(cuid())
   nome      String
@@ -15,6 +22,7 @@ model Empresa {
   criadoEm  DateTime @default(now())
   produtos  Produto[]
 }
+
 model Produto {
   id        String   @id @default(cuid())
   empresaId String
@@ -24,6 +32,7 @@ model Produto {
   criadoEm  DateTime @default(now())
   empresa   Empresa  @relation(fields: [empresaId], references: [id])
 }
+
 model NotaFiscal {
   id        String   @id @default(cuid())
   empresaId String
@@ -33,6 +42,7 @@ model NotaFiscal {
   empresa   Empresa  @relation(fields: [empresaId], references: [id])
   itens     ItemNF[]
 }
+
 model ItemNF {
   id         String     @id @default(cuid())
   notaId     String
