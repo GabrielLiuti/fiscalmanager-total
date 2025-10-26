@@ -1,30 +1,48 @@
-import { Router } from 'express';
-import multer from 'multer';
-import { PrismaClient } from '@prisma/client';
+import { Router } from "express";
+import multer from "multer";
+import { PrismaClient } from "@prisma/client";
 
-const upload = multer({ limits: { fileSize: 2 * 1024 * 1024 } });
 const prisma = new PrismaClient();
-export const notasRouter = Router();
+const router = Router();
+const upload = multer({ dest: "uploads/" });
 
-notasRouter.post('/import-xml', upload.array('files'), async (req, res) => {
-  const empresaId = req.body.empresaId as string;
-  if (!empresaId) return res.status(400).json({ error: 'empresaId é obrigatório' });
-  if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
-    return res.status(400).json({ error: 'Arquivos XML são obrigatórios' });
-  }
-  const created = [];
-  for (const f of req.files as Express.Multer.File[]) {
-    const xml = f.buffer.toString('utf-8');
-    const chave = 'CH' + Math.random().toString(36).slice(2, 12).toUpperCase();
-    const nota = await prisma.notaFiscal.create({ data: { empresaId, chave, xmlRaw: xml } });
-    created.push(nota);
-  }
-  res.status(201).json({ imported: created.length, notas: created });
+// ✅ Listar notas fiscais
+router.get("/", async (_req, res) => {
+  const notas = await prisma.notaFiscal.findMany({
+    include: { itens: true, empresa: true },
+  });
+  res.json(notas);
 });
 
-notasRouter.get('/', async (req, res) => {
-  const empresaId = req.query.empresaId as string | undefined;
-  const where = empresaId ? { empresaId } : {};
-  const data = await prisma.notaFiscal.findMany({ where, orderBy: { criadoEm: 'desc' } });
-  res.json(data);
+// ✅ Criar nova nota fiscal
+router.post("/", async (req, res) => {
+  const { numero, empresaId, total } = req.body;
+  if (!numero || !empresaId)
+    return res.status(400).json({ error: "Número e empresa são obrigatórios." });
+
+  const nota = await prisma.notaFiscal.create({
+    data: {
+      numero,
+      total: Number(total) || 0,
+      empresaId,
+    },
+  });
+  res.status(201).json(nota);
 });
+
+// ✅ Upload de XML da nota
+router.post("/upload", upload.single("arquivo"), async (req, res) => {
+  if (!req.file)
+    return res.status(400).json({ error: "Arquivo XML não enviado." });
+
+  // Aqui você pode implementar o parse do XML
+  res.json({ message: "Upload recebido com sucesso.", file: req.file.filename });
+});
+
+// ✅ Deletar nota
+router.delete("/:id", async (req, res) => {
+  await prisma.notaFiscal.delete({ where: { id: Number(req.params.id) } });
+  res.json({ message: "Nota fiscal removida com sucesso." });
+});
+
+export default router;
