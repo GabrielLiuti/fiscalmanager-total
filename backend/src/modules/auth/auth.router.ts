@@ -25,5 +25,7 @@ authRouter.post('/login', async (req, res) => {
 
   const secret = process.env.JWT_SECRET || 'dev';
   const token = jwt.sign({ sub: user.id, role: user.role }, secret, { expiresIn: '1h' });
-  res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
+  res.json({ token, user: { id: user.id, email: user.email, role: user.role 
+   export default router;
+                       } });
 });
