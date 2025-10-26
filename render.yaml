@@ -8,7 +8,9 @@ services:
     buildCommand: |
       npm install
       npx prisma generate
+      npx prisma db push
       npm run build
+
       # opcional: aplicar schema na primeira vez (se preferir, faça manualmente no dashboard)
       # npx prisma db push
     startCommand: node dist/server.js
