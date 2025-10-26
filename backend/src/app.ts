@@ -23,6 +23,7 @@ import empresasRouter from "./modules/empresas/empresas.router";
 import produtosRouter from "./modules/produtos/produtos.router";
 import notasRouter from "./modules/notas/notas.router";
 
+
 app.use("/api/auth", authRouter);
 app.use("/api/empresas", empresasRouter);
 app.use("/api/produtos", produtosRouter);
