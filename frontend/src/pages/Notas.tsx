@@ -1,42 +1,115 @@
-import { useEffect, useState } from 'react'
-import axios from 'axios'
-const API = import.meta.env.VITE_API_BASE_URL
+import React, { useEffect, useState, FormEvent } from "react";
+import api from "../services/api";
 
-export default function Notas() {
-  const [empresaId, setEmpresaId] = useState('')
-  const [notas, setNotas] = useState<any[]>([])
-  const [files, setFiles] = useState<FileList | null>(null)
-  const token = localStorage.getItem('token')
+interface Nota {
+  id: number;
+  empresaId: number;
+  total: number;
+}
 
-  const fetchNotas = async () => {
-    const { data } = await axios.get(`${API}/notas`, { params: { empresaId } })
-    setNotas(data)
-  }
+interface ProdutoNota {
+  produtoId: string;
+  quantidade: string;
+  precoUnitario: string;
+}
 
-  const upload = async () => {
-    if (!files || !empresaId) return
-    const fd = new FormData()
-    Array.from(files).forEach(f => fd.append('files', f))
-    fd.append('empresaId', empresaId)
-    await axios.post(`${API}/notas/import-xml`, fd, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    fetchNotas()
-  }
+interface NovaNota {
+  empresaId: string;
+  produtos: ProdutoNota[];
+}
 
-  useEffect(() => { fetchNotas() }, [])
+const Notas: React.FC = () => {
+  const [notas, setNotas] = useState<Nota[]>([]);
+  const [nova, setNova] = useState<NovaNota>({
+    empresaId: "",
+    produtos: [{ produtoId: "", quantidade: "", precoUnitario: "" }]
+  });
+
+  useEffect(() => {
+    carregarNotas();
+  }, []);
+
+  const carregarNotas = async () => {
+    try {
+      const res = await api.get("/notas");
+      setNotas(res.data);
+    } catch (err) {
+      console.error("Erro ao carregar notas:", err);
+    }
+  };
+
+  const criarNota = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      await api.post("/notas", nova);
+      alert("✅ Nota fiscal criada com sucesso!");
+      setNova({
+        empresaId: "",
+        produtos: [{ produtoId: "", quantidade: "", precoUnitario: "" }]
+      });
+      carregarNotas();
+    } catch (err) {
+      console.error("Erro ao criar nota:", err);
+      alert("❌ Erro ao criar nota fiscal.");
+    }
+  };
 
   return (
-    <div>
-      <h1>Notas</h1>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-        <input value={empresaId} onChange={e => setEmpresaId(e.target.value)} placeholder="empresaId" />
-        <input type="file" multiple accept=".xml" onChange={e => setFiles(e.target.files)} />
-        <button onClick={upload}>Importar XML</button>
-      </div>
+    <div style={{ maxWidth: 700, margin: "auto", padding: 20 }}>
+      <h2>Notas Fiscais</h2>
+
+      <form onSubmit={criarNota} style={{ marginBottom: 20 }}>
+        <input
+          placeholder="ID da Empresa"
+          value={nova.empresaId}
+          onChange={e => setNova({ ...nova, empresaId: e.target.value })}
+          required
+        />
+        <input
+          placeholder="ID do Produto"
+          value={nova.produtos[0].produtoId}
+          onChange={e =>
+            setNova({
+              ...nova,
+              produtos: [{ ...nova.produtos[0], produtoId: e.target.value }]
+            })
+          }
+          required
+        />
+        <input
+          placeholder="Quantidade"
+          value={nova.produtos[0].quantidade}
+          onChange={e =>
+            setNova({
+              ...nova,
+              produtos: [{ ...nova.produtos[0], quantidade: e.target.value }]
+            })
+          }
+          required
+        />
+        <input
+          placeholder="Preço Unitário"
+          value={nova.produtos[0].precoUnitario}
+          onChange={e =>
+            setNova({
+              ...nova,
+              produtos: [{ ...nova.produtos[0], precoUnitario: e.target.value }]
+            })
+          }
+          required
+        />
+        <button type="submit">Emitir Nota</button>
+      </form>
+
       <ul>
-        {notas.map(n => <li key={n.id}>{n.id} — {n.chave}</li>)}
+        {notas.map(n => (
+          <li key={n.id}>
+            <strong>Nota #{n.id}</strong> — Empresa {n.empresaId} — Total: R$ {n.total}
+          </li>
+        ))}
       </ul>
     </div>
-  )
-}
+  );
+};
+
+export default Notas;
