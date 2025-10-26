@@ -7,48 +7,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Usuario {
-  id         String   @id @default(cuid())
-  email      String   @unique
-  senhaHash  String
-  role       String   @default("admin")
-  criadoEm   DateTime @default(now())
-}
-
 model Empresa {
-  id        String    @id @default(cuid())
+  id        Int           @id @default(autoincrement())
   nome      String
-  cnpj      String    @unique
+  cnpj      String        @unique
   endereco  String?
-  produtos  Produto[]
+  produtos  Produto[]     @relation("EmpresaProdutos")
   notas     NotaFiscal[]
-  criadoEm  DateTime  @default(now())
 }
 
 model Produto {
-  id        Int      @id @default(autoincrement())
-  nome      String
-  preco     Float
-  ncm       String?  // ← adicione esta linha
-  criadoEm  DateTime @default(now())
-  atualizadoEm DateTime @updatedAt
+  id         Int           @id @default(autoincrement())
+  nome       String
+  preco      Float
+  ncm        String?       // campo opcional
+  empresaId  Int?
+  empresa    Empresa?      @relation("EmpresaProdutos", fields: [empresaId], references: [id])
+  itensNF    ItemNF[]
 }
 
 model NotaFiscal {
-  id         String    @id @default(cuid())
+  id         Int           @id @default(autoincrement())
   numero     String
-  total      Float
-  empresaId  String
-  empresa    Empresa   @relation(fields: [empresaId], references: [id])
+  data       DateTime      @default(now())
+  empresaId  Int
+  empresa    Empresa       @relation(fields: [empresaId], references: [id])
   itens      ItemNF[]
-  criadoEm   DateTime  @default(now())
 }
 
 model ItemNF {
-  id         String      @id @default(cuid())
-  notaId     String
-  produtoId  String?
+  id         Int           @id @default(autoincrement())
   quantidade Int
-  nfe        NotaFiscal  @relation(fields: [notaId], references: [id])
-  produto    Produto?    @relation(fields: [produtoId], references: [id])
+  valor      Float
+  notaId     Int
+  produtoId  Int?
+  nfe        NotaFiscal    @relation(fields: [notaId], references: [id])
+  produto    Produto?      @relation(fields: [produtoId], references: [id])
 }
+
+mo
