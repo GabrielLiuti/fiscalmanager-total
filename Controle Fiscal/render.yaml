@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: fiscalmanager-backend
+    env: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: |
+      npm ci
+      npm run build
+      npx prisma generate
+      # opcional: aplicar schema na primeira vez (se preferir, faça manualmente no dashboard)
+      # npx prisma db push
+    startCommand: node dist/server.js
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: fiscalmanager-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: https://GabrielLiuti.github.io/fiscalmanager-total
+
+databases:
+  - name: fiscalmanager-db
+    plan: free
+    databaseName: fiscalmanager
+    user: fiscal_user

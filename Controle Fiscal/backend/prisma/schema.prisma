@@ -1,0 +1,48 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+
+model Usuario {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  senhaHash String
+  role      String   @default("admin")
+  criadoEm  DateTime @default(now())
+}
+model Empresa {
+  id        String   @id @default(cuid())
+  nome      String
+  cnpj      String   @unique
+  criadoEm  DateTime @default(now())
+  produtos  Produto[]
+}
+model Produto {
+  id        String   @id @default(cuid())
+  empresaId String
+  nome      String
+  ncm       String
+  cfop      String?
+  criadoEm  DateTime @default(now())
+  empresa   Empresa  @relation(fields: [empresaId], references: [id])
+}
+model NotaFiscal {
+  id        String   @id @default(cuid())
+  empresaId String
+  chave     String   @unique
+  xmlRaw    String
+  criadoEm  DateTime @default(now())
+  empresa   Empresa  @relation(fields: [empresaId], references: [id])
+  itens     ItemNF[]
+}
+model ItemNF {
+  id         String     @id @default(cuid())
+  notaId     String
+  produtoId  String?
+  descricao  String?
+  ncm        String
+  cfop       String?
+  quantidade Decimal     @default(1.0)
+  valorUnit  Decimal     @default(0.0)
+  valorTotal Decimal     @default(0.0)
+  nfe        NotaFiscal  @relation(fields: [notaId], references: [id])
+  produto    Produto?    @relation(fields: [produtoId], references: [id])
+}
