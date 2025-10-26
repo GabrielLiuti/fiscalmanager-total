@@ -1,10 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// ✅ Corrige o caminho base para deploy no Render
+// ✅ Corrige a base para Render (serve direto da raiz)
 export default defineConfig({
   plugins: [react()],
-  base: '/', // <---- ESSENCIAL!
+  base: '/', // <-- ESSENCIAL: remove o /fiscalmanager-total/
   build: {
     outDir: 'dist',
   },
