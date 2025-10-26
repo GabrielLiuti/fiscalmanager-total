@@ -44,4 +44,33 @@ const Login: React.FC = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full mt-2 p-2 border rounded-md focus:ring focus:ring-blue-
+            className="w-full mt-2 p-2 border rounded-md focus:ring focus:ring-blue-300"
+          />
+        </label>
+
+        <label className="block mb-4">
+          <span className="text-gray-700">Senha</span>
+          <input
+            type="password"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            required
+            className="w-full mt-2 p-2 border rounded-md focus:ring focus:ring-blue-300"
+          />
+        </label>
+
+        {erro && <p className="text-red-600 text-sm mb-3">{erro}</p>}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+        >
+          {loading ? "Entrando..." : "Entrar"}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default Login;
