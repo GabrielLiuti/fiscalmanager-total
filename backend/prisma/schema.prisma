@@ -45,4 +45,11 @@ model ItemNF {
   produto    Produto?      @relation(fields: [produtoId], references: [id])
 }
 
-mo
+model Usuario {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  senhaHash  String
+  role       String   @default("user")
+  criadoEm   DateTime @default(now())
+}
+
