@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard'
 import Notas from './pages/Notas'
 
 export default function App() {
+  console.log("✅ App.tsx carregado!"); // 👈 linha de teste
   return (
     <div style={{ fontFamily: 'Inter, sans-serif', padding: 16 }}>
       <header style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
@@ -17,5 +18,6 @@ export default function App() {
         <Route path="/login" element={<Login />} />
       </Routes>
     </div>
-  )
+  );
 }
+
