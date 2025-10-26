@@ -1,0 +1,19 @@
+openapi: 3.0.0
+info:
+  title: FiscalManager Total API
+  version: 1.0.0
+  description: API de gestão fiscal, empresas, produtos e notas fiscais.
+servers:
+  - url: https://fiscalmanager-backend.onrender.com
+paths:
+  /api/empresas:
+    get:
+      summary: Lista todas as empresas
+      responses:
+        "200":
+          description: Lista retornada com sucesso
+    post:
+      summary: Cria uma nova empresa
+      responses:
+        "201":
+          description: Empresa criada
