@@ -4,10 +4,11 @@ import helmet from "helmet";
 import dotenv from "dotenv";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
-import { authRouter } from './modules/auth/auth.router.js';
-import { empresasRouter } from './modules/empresas/empresas.router.js';
-import { produtosRouter } from './modules/produtos/produtos.router.js';
-import { notasRouter } from './modules/notas/notas.router.js';
+import * as authRoutes from "./modules/auth/auth.router";
+import * as empresasRoutes from "./modules/empresas/empresas.router";
+import * as produtosRoutes from "./modules/produtos/produtos.router";
+import * as notasRoutes from "./modules/notas/notas.router";
+
 
 dotenv.config();
 
