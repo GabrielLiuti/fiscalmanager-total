@@ -1,32 +1,30 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import dotenv from "dotenv";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 
-dotenv.config();
+import empresasRouter from "./modules/empresas/empresas.router.js";
+import produtosRouter from "./modules/produtos/produtos.router.js";
+import notasRouter from "./modules/notas/notas.router.js";
 
 const app = express();
 
-app.use(express.json());
+// Configurações básicas
 app.use(cors());
 app.use(helmet());
+app.use(express.json());
 
-// Swagger
+// Swagger (documentação)
 const swaggerDocument = YAML.load("./swagger.yaml");
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Rotas principais
-import authRouter from "./modules/auth/auth.router";
-import empresasRouter from "./modules/empresas/empresas.router";
-import produtosRouter from "./modules/produtos/produtos.router";
-import notasRouter from "./modules/notas/notas.router";
-
-
-app.use("/api/auth", authRouter);
 app.use("/api/empresas", empresasRouter);
 app.use("/api/produtos", produtosRouter);
 app.use("/api/notas", notasRouter);
+
+// Rota padrão
+app.get("/", (_, res) => res.send("✅ API FiscalManager Total online!"));
 
 export default app;
